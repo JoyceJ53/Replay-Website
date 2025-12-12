@@ -1,0 +1,11 @@
+Replay Website Notes:
+- add a title/header to the tutorial video on the home page. (we need people to understand what the video contains before clicking on it)
+- why are there two "create now" buttons on the home page. Where do they go? Can we remove one to reduce redundancy?
+- Where does the upgrade button on the footer go? Would it be better somewhere else? (REMOVE THIS)
+- There should be more explaination about the desktop app on the website
+- add a "delete account button" on profile page? (YES - WAIT ON DESIGN)
+- maybe add some videos to the pricing page so people know what they're buying a little clearer (there seems to be a large learning curve)
+- Maybe add a tutorial page (I know there's a tutorial video on the home page, but it's easier for users to find if you have a page dedicated to it.) (maybe the button on the home page by the vid goes to the tutorial page?)
+- the scrapbook creation is a little confusing. Which page goes to what
+- what do you want on the first portion of the cart?
+- Where does the "create" button on the header go? (Scrapbook creation? Video creation?)

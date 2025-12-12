@@ -1,0 +1,25 @@
+Replay Pages Layout:
+
+
+Header:
+
+- Home:
+  |
+   - Create
+
+- Download
+
+- Contact
+- Create
+- Price
+- Cart
+- Account
+
+
+Footer:
+
+- Privacy Policy
+- Terms of Service
+- Contact
+- Upgrade
+- FAQ

@@ -1,0 +1,214 @@
+/* --- LAYOUT & CONTAINERS --- */
+.horizontal-layout {
+    display: flex;
+    flex-direction: row;
+    margin-top: 70px;
+    height: calc(100vh - 70px);
+}
+
+.sidebar,
+.subsidebar {
+    width: 250px;
+    border-right: 1px solid #ccc;
+}
+
+.subsidebar {
+    overflow-y: auto;
+}
+
+.scrapbook-canvas-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #e0e0e0; /* light gray background so white pages pop */
+    padding: 2rem;
+    overflow: auto; /* Allow scrolling if pages overflow */
+}
+
+/* --- PAGE SPREAD --- */
+.scrapbook-pages {
+    display: flex;
+    gap: 2rem;
+    perspective: 1500px; /* Essential for 3D flip effect */
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- PAGE BASICS & CORNERS --- */
+.page {
+    position: relative;
+    width: 400px;
+    height: 550px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow: hidden; /* Hide item overflow */
+}
+
+.corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    z-index: 20;
+    cursor: pointer;
+}
+
+/* Corner positions (using the simplified classes from the JS logic) */
+.corner.tl { top: 0; left: 0; }
+.corner.tr { top: 0; right: 0; }
+.corner.bl { bottom: 0; left: 0; }
+.corner.br { bottom: 0; right: 0; }
+
+/* Folded visual effect */
+.corner.folded::after {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    transform-origin: 0 0;
+    box-shadow: -3px 3px 6px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, rgba(230,230,230,1) 0%, rgba(200,200,200,1) 100%);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    left: 0;
+    top: 0;
+    transition: transform 0.35s ease;
+}
+
+/* --- PAGE FLIP ANIMATIONS --- */
+.page.flip-forward {
+    animation: pageFlipForward 0.8s forwards;
+}
+@keyframes pageFlipForward {
+    0% { transform: rotateY(0deg); transform-origin: left center; }
+    100% { transform: rotateY(-180deg); transform-origin: left center; }
+}
+.page.flip-backward {
+    animation: pageFlipBackward 0.8s forwards;
+}
+@keyframes pageFlipBackward {
+    0% { transform: rotateY(0deg); transform-origin: right center; }
+    100% { transform: rotateY(180deg); transform-origin: right center; }
+}
+
+/* --- ADD PAGE BUTTON --- */
+.add-page-button {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(180deg,#fff,#e6e6e6);
+    color: #333;
+    border: 2px solid #ccc;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    /* Ensure the button is clickable over the canvas */
+    z-index: 30; 
+}
+
+/* --- DRAGGABLE ITEMS & SELECTION --- */
+.scrapbook-item-container {
+    position: absolute;
+    user-select: none;
+    cursor: grab;
+    z-index: 50;
+    background: transparent; /* Critical for image visibility */
+    overflow: visible; /* Allows handles to show outside bounds */
+}
+
+.scrapbook-item-container.selected {
+    /* Highlight when selected */
+    outline: 2px dashed #007bff;
+    outline-offset: 4px;
+    border: none !important; /* Overrides any previous border logic */
+}
+
+/* Ensures images inside the container are visible and scaled */
+.scrapbook-item-container img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    opacity: 1; 
+}
+
+/* --- DELETE BUTTON (X) --- */
+.delete-item-btn {
+    position: absolute;
+    top: -15px; /* Moved away from resize handles */
+    right: -15px;
+    z-index: 61; 
+    
+    background: red;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    line-height: 22px; 
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 0;
+}
+
+/* --- RESIZE/ROTATE CONTROL HANDLES --- */
+.control-handle {
+    position: absolute;
+    width: 14px; 
+    height: 14px;
+    background-color: white;
+    border: 1px solid #007bff;
+    border-radius: 50%;
+    z-index: 60; 
+    pointer-events: all; /* Important: ensures mouse events hit the handle, not the item */
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.4); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #007bff;
+    font-size: 10px;
+}
+
+/* Rotate Handle */
+.rotate-handle {
+    top: -30px; 
+    left: 50%;
+    transform: translateX(-50%);
+    /* Uses the fallback grab cursor */
+    cursor: grab; 
+    background-color: white; 
+    border: 1px solid #007bff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; /* Size for the icon */
+    color: #007bff;
+}
+.rotate-handle:before {
+    content: '↻'; /* Visible rotation icon */
+    font-weight: bold;
+}
+
+/* Resize Handles (Position & Cursor) */
+.resize-handle.tl { top: -7px; left: -7px; cursor: nwse-resize; }
+.resize-handle.tr { top: -7px; right: -7px; cursor: nesw-resize; }
+.resize-handle.bl { bottom: -7px; left: -7px; cursor: swne-resize; } 
+.resize-handle.br { bottom: -7px; right: -7px; cursor: nwse-resize; }
+
+/* Resize Handle Icons (Visible Arrows) */
+.resize-handle.tl:before { content: '↖'; }
+.resize-handle.tr:before { content: '↗'; }
+.resize-handle.bl:before { content: '↙'; }
+.resize-handle.br:before { content: '↘'; }

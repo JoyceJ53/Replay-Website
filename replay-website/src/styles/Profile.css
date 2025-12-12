@@ -1,0 +1,178 @@
+.profile-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.profile-card {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  gap: 3rem;
+}
+
+/* LEFT SIDE */
+.profile-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+}
+
+.profile-username {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.profile-delete-btn {
+  padding: 8px 20px;
+  background-color: #c8eaf0;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+}
+
+/* DIVIDER LINE */
+.profile-divider {
+  width: 2px;
+  background-color: rgba(207, 207, 207, 0.7);
+}
+
+/* RIGHT SIDE */
+.profile-right {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ROWS */
+.profile-row {
+  display: grid;
+  grid-template-columns: 150px auto auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-row h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.profile-row p {
+  margin: 0;
+  color: #333;
+}
+
+/* Inline edit button (NOT absolute positioned anymore) */
+.edit-inline {
+  padding: 2px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #7a7a7a;
+  white-space: nowrap;
+}
+
+.edit-inline:hover {
+  color: #000;
+}
+
+/* Bookshelf button */
+.profile-bookshelf-btn {
+  padding: 6px 16px;
+  background-color: #f0cf73;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.name-edit-icon {
+  margin-left: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #7a7a7a;
+}
+
+.name-edit-icon:hover {
+  color: #000;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.popup-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.popup-box input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.name-input {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+/* ========================
+   New CSS for book canvas
+   ======================== */
+
+/* Option 1: Large canvas inside relative container */
+.book-container {
+  position: relative;
+  width: 2000px; /* total book width */
+  height: 1000px; /* book height */
+}
+
+.canvas-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%; /* covers multiple pages if each page is 100% of container width */
+  height: 100%;
+  pointer-events: auto; /* allow interacting with items */
+  z-index: 0; /* behind page visuals */
+}
+
+.page-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%; /* each page 50% of book container */
+  height: 100%;
+  border: 1px solid #ccc; /* page frame look */
+  pointer-events: none;
+}
+

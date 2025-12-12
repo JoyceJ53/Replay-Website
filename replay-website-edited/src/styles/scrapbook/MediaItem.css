@@ -1,0 +1,16 @@
+.media-item.selected {
+  border: 2px dashed blue;
+}
+.delete-item-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  z-index: 10;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}

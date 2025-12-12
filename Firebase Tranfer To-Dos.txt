@@ -1,0 +1,2 @@
+- Transfer users & permissions (Project settings/Users & Permissions)
+- Change support email (Project settings/General)

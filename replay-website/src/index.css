@@ -1,0 +1,46 @@
+/* src/index.css */
+
+/* Ensure full height for layout flex to work */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base styles */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
+  background-color: #f8f9fa; /* light neutral background */
+  line-height: 1.6;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  color: #222;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Buttons (generic) */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  padding: 0;
+  background-color: #f1db8f;
+}
+
+/* Utility class: container width */
+.container {
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+}

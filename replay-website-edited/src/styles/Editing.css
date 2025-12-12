@@ -1,0 +1,280 @@
+/* ==============================
+   WRAPPER & CONTAINER
+============================== */
+.editing-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.editing-container 
+{ display: flex; flex-direction: row; /* side by side */ height: calc(100vh - 70px); overflow: hidden; }
+.editing-wrapper .editing-header { height: 70px; background: #f5f5f5; width: 100%; }
+
+/* ==============================
+   SIDEBARS
+============================== */
+.sidebar {
+  width: 90px;
+  background-color: #b2b2b2;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1rem;
+}
+
+.tab {
+  width: 100%;
+  padding: 10px 0;
+  margin: 5px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tab:hover,
+.tab.active {
+  background-color: #858282;
+  border-radius: 6px;
+  margin-left: 0px;
+}
+
+.tab-emoji {
+  font-size: 1.5rem;
+}
+
+.tab-label {
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.sub-sidebar {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  background: #d5d5d5;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.sub-sidebar.open {
+  width: 240px;
+  padding: 1rem;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+.sidebar {
+  /* height: 100vh;   stretch down */
+  flex-shrink: 0;  /* prevent collapsing */
+}
+
+.sub-sidebar {
+  /* height: 100vh;   stretch down */
+  flex-shrink: 0;  /* prevent collapsing */
+}
+
+
+/* ==============================
+   MEDIA LIST & MEDIA WRAPPER
+============================== */
+.media-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.media-wrapper img,
+.clipart-item {
+  display: block;
+  width: 100%;
+  border-radius: 6px;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.media-wrapper:hover img {
+  filter: brightness(60%);
+}
+
+.overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  text-align: center;
+}
+
+.media-wrapper:hover .overlay-text {
+  opacity: 1;
+}
+
+/* ==============================
+   SCRAPBOOK CANVAS
+============================== */
+.scrapbook-canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.scrapbook-background {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  width: 800px;
+  height: 550px;
+  position: relative;
+  /* removed border to eliminate outline */
+  border: none;
+}
+
+.scrapbook-background::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 10px;
+  /* partially transparent line so items show underneath */
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(212,212,212,0.5) 50%, rgba(255,255,255,0) 100%);
+  transform: translateX(-50%);
+}
+
+
+
+/* ==============================
+   CLIPART
+============================== */
+.clipart-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.clipart-item {
+  border-radius: 6px;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 5px;
+  cursor: grab;
+}
+
+/* ==============================
+   TEXT TAB
+============================== */
+.text-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 10px;
+}
+
+.text-input, .text-select {
+  padding: 6px 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.add-text-button {
+  padding: 6px 10px;
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-text-button:hover {
+  background-color: #45a049;
+}
+.add-page-button { margin: 10px; padding: 8px 12px; font-size: 14px; }
+
+.editing-container {
+  display: flex;
+  flex-direction: row; /* side by side */
+  height: calc(100vh - 70px);
+  overflow: hidden;
+}
+
+/* Sidebar */
+.editing-container > .sidebar {
+  width: 200px; /* fixed width */
+  flex-shrink: 0;
+}
+
+/* SubSidebar */
+.editing-container > .subsidebar {
+  width: 200px; /* fixed width */
+  flex-shrink: 0;
+}
+
+/* Canvas takes remaining space */
+.editing-container > .scrapbook-canvas-wrapper {
+  flex: 1;
+  overflow: auto;
+}
+.sidebar-container 
+{ 
+  margin-top: 70px;
+  display: flex; 
+  flex-direction: row; 
+  gap: 8px;
+} 
+
+
+
+/* Add these styles to your relevant CSS file (e.g., scrapbook/Scrapbook.css or Editing.css) */
+
+/* Container for draggable items */
+.scrapbook-item-container {
+    position: absolute; /* Essential for Draggable */
+    border: 2px solid transparent; 
+    transition: border-color 0.1s;
+    user-select: none;
+    cursor: grab;
+}
+
+.scrapbook-item-container.selected {
+    border-color: #007bff; /* Highlight when selected */
+}
+
+/* Delete Button Styling */
+.delete-item-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff4d4d;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+}

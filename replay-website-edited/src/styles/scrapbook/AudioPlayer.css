@@ -1,0 +1,9 @@
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.audio-player button {
+  padding: 2px 5px;
+  cursor: pointer;
+}
