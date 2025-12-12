@@ -1,85 +1,4 @@
 /* ==============================
-   HEADER
-============================== */
-.editing-header {
-  height: 70px;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* ==============================
-   WRAPPER & CONTAINER
-============================== */
-.editing-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.editing-container {
-  display: flex;
-  flex: 1;
-  height: calc(100vh - 70px);
-}
-
-/* ==============================
-   SIDEBARS
-============================== */
-.sidebar {
-  width: 90px;
-  background-color: #b2b2b2;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 1rem;
-}
-
-.tab {
-  width: 100%;
-  padding: 10px 0;
-  margin: 5px;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.tab:hover,
-.tab.active {
-  background-color: #858282;
-  border-radius: 6px;
-}
-
-.tab-emoji {
-  font-size: 1.5rem;
-}
-
-.tab-label {
-  font-size: 0.8rem;
-  margin-top: 4px;
-}
-
-.sub-sidebar {
-  width: 0;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  background: #d5d5d5;
-  padding: 0;
-}
-
-.sub-sidebar.open {
-  width: 240px;
-  padding: 1rem;
-  overflow-y: auto;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-}
-
-/* ==============================
    UPLOAD BUTTON & MODAL
 ============================== */
 .upload-button {
@@ -145,64 +64,14 @@
   color: red;
   margin-bottom: 10px;
 }
-
-/* ==============================
-   MEDIA & CLIPART
-============================== */
-.media-list img,
-.clipart-item {
-  width: 100%;
-  border-radius: 6px;
+.cancel-btn{
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: rgba(255, 22, 22, 0.791);
+  border: 1px solid rgb(165, 8, 8); 
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.media-list img:hover,
-.clipart-item:hover {
-  transform: scale(1.03);
-}
-
-/* ==============================
-   SCRAPBOOK CANVAS
-============================== */
-.scrapbook-canvas {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.scrapbook-background {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  padding: 2rem;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-  width: 800px;
-  height: 550px;
-  position: relative;
-}
-
-.scrapbook-background::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 10px;
-  background: linear-gradient(to right, white 0%, rgba(212,212,212,0.4) 50%, white 100%);
-  transform: translateX(-50%);
-}
-
-.page {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
 }
