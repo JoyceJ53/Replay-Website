@@ -17,7 +17,6 @@ setUploadError("");
 
 
 try {
-  // Convert file to Base64 (from old version)
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -28,7 +27,6 @@ try {
 
   const base64 = await fileToBase64(uploadFile);
 
-  // Determine collection and type (old version logic)
   const collectionName = ["media", "music", "background", "clipart"].includes(selectedTab)
     ? selectedTab
     : "media";
@@ -46,7 +44,6 @@ try {
       ? "video"
       : "other";
 
-  // Add document to Firestore
   await addDoc(collection(db, "users", user.uid, "scrapbook", scrapbookId, collectionName), {
     name: uploadFile.name,
     type,
@@ -54,7 +51,6 @@ try {
     createdAt: serverTimestamp(),
   });
 
-  // Refresh media list
   const q = query(
     collection(db, "users", user.uid, "scrapbook", scrapbookId, collectionName),
     orderBy("createdAt", "desc")
@@ -64,7 +60,7 @@ try {
   setMediaFiles((prev) => [...prev.filter((m) => m.subcollection !== collectionName), ...newMedia]);
 
   setUploadFile(null);
-  close(); // close modal
+  close();
   alert("Upload successful!");
 } catch (err) {
   console.error(err);

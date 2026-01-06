@@ -45,7 +45,6 @@ export default function Profile() {
   };
 
   const saveName = () => {
-    // Eventually update Firebase displayName
     setEditingName(false);
   };
 

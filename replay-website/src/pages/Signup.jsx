@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/firebase"; // your Firestore instance
+import { db } from "../firebase/firebase";
 import "../styles/Signup.css";
 
 export default function Signup() {
@@ -60,7 +60,7 @@ export default function Signup() {
     setError("");
     try {
       const result = await loginWithGoogle();
-      const user = result.user; // Get Firebase user
+      const user = result.user; 
       await addUserToFirestore(user);
       navigate("/profile");
     } catch (err) {

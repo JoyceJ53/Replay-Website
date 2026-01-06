@@ -17,7 +17,7 @@ export default function Scrapbook({ scrapbookId }) {
   
   const [selectedTab, setSelectedTab] = useState(null);
   const [mediaFiles, setMediaFiles] = useState([]);
-  const [selectedItemId, setSelectedItemId] = useState(null); // Lifted state for selection
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
   const undoStack = useRef([]);
   const redoStack = useRef([]);
@@ -76,6 +76,8 @@ export default function Scrapbook({ scrapbookId }) {
     }
   };
 
+
+  
   // --- ITEM UPDATES (TEXT & CROP) ---
   const updateItemField = (pageId, itemId, field, value) => {
     setPages((prevPages) => {
@@ -88,7 +90,7 @@ export default function Scrapbook({ scrapbookId }) {
                 return item;
             });
             const newPage = { ...page, items: updatedItems };
-            savePage(newPage); // Debounce this in production
+            savePage(newPage);
             return newPage;
         });
         return updatedPages;
@@ -157,9 +159,8 @@ export default function Scrapbook({ scrapbookId }) {
             if (page.id !== pageId) return page;
             const newItem = { 
                 ...droppedItem, x, y, 
-                // Default props for new features
                 fontSize: 16, fontFamily: 'Arial', content: droppedItem.content || "Double click to edit",
-                objectPositionX: 50, objectPositionY: 50, // Center crop
+                objectPositionX: 50, objectPositionY: 50,
                 width: droppedItem.width || 200, height: droppedItem.height || 200
             };
             const updatedPage = { ...page, items: [...(page.items || []), newItem] };
@@ -185,7 +186,6 @@ export default function Scrapbook({ scrapbookId }) {
     });
   };
 
-  // Helper to find currently selected item data for sidebar
   const getSelectedItem = () => {
       if(!selectedItemId) return null;
       for(let p of pages) {
@@ -205,7 +205,6 @@ export default function Scrapbook({ scrapbookId }) {
           mediaFiles={mediaFiles}
           setMediaFiles={setMediaFiles}
           scrapbookId={scrapbookId}
-          // Feature 1 Props
           selectedItemData={getSelectedItem()}
           updateItemField={updateItemField}
         />
@@ -229,7 +228,6 @@ export default function Scrapbook({ scrapbookId }) {
                 handleStopDrag={handleStopDrag}
                 updateItemSizeRotation={updateItemSizeRotation}
                 
-                // Pass selection props down
                 selectedItemId={selectedItemId}
                 setSelectedItemId={setSelectedItemId}
                 updateItemField={updateItemField}

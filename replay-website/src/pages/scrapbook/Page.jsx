@@ -16,34 +16,28 @@ export default function Page({
     deleteItem, 
     handleDropMedia,
     updateItemSizeRotation,
-    // New Props
     selectedItemId,
     setSelectedItemId,
     updateItemField
 }) {
-    // Only render if it's the current left or current right page
     const isLeft = index === currentPageIndex;
     const isRight = index === currentPageIndex + 1;
     
-    // Simple optimization: don't render hidden pages to save DOM weight
     if (!isLeft && !isRight) return null;
 
     const constraintsRef = useRef(null); 
     const [hoverCorner, setHoverCorner] = useState(null); 
     const [activeControl, setActiveControl] = useState(null); 
-    
-    // Feature 4: Animation State
     const [isTurning, setIsTurning] = useState(false);
 
     const handleCornerClick = (corner) => {
-        // Feature 4: Trigger Animation + Action
         if ((corner === "tr" || corner === "br") && isRight) {
             setIsTurning("forward");
             setTimeout(() => {
                 if (currentPageIndex + 2 >= totalPages) addNewPage && addNewPage();
                 onFlipForward && onFlipForward();
                 setIsTurning(false);
-            }, 600); // Sync with CSS animation time
+            }, 600); 
         } else if ((corner === "tl" || corner === "bl") && isLeft) {
             setIsTurning("backward");
             setTimeout(() => {
@@ -68,7 +62,6 @@ export default function Page({
         if (data) {
             try {
                 const item = JSON.parse(data);
-                // Center item on mouse drop
                 const centeredX = dropX - (item.width || 100) / 2;
                 const centeredY = dropY - (item.height || 100) / 2;
                 handleDropMedia(page.id, item, centeredX, centeredY);
@@ -76,7 +69,7 @@ export default function Page({
         }
     };
 
-    // --- RESIZE/ROTATE LOGIC (Unchanged) ---
+    // --- RESIZE/ROTATE LOGIC ---
     const handleResizeRotateStart = (e, itemId, type) => {
         e.preventDefault(); e.stopPropagation(); 
         const item = page.items.find(i => i.id === itemId);
@@ -86,6 +79,8 @@ export default function Page({
             startX: e.clientX, startY: e.clientY,
             initialWidth: item.width || 100, initialHeight: item.height || 100,
             initialRotation: item.rotation || 0, initialX: item.x || 0, initialY: item.y || 0,
+            initialImgW: item.imgW, initialImgH: item.imgH,
+            initialImgX: item.imgX, initialImgY: item.imgY
         });
     };
 
@@ -97,7 +92,7 @@ export default function Page({
     const handleControlMove = useCallback((e) => {
         if (!activeControl || !constraintsRef.current) return;
         e.preventDefault();
-        const { itemId, type, startX, startY, initialWidth, initialHeight, initialRotation, initialX, initialY } = activeControl;
+        const { itemId, type, startX, startY, initialWidth, initialHeight, initialRotation, initialX, initialY, initialImgW, initialImgH, initialImgX, initialImgY } = activeControl;
         const pageRect = constraintsRef.current.getBoundingClientRect();
         const itemCenterGlobalX = pageRect.left + initialX + initialWidth / 2;
         const itemCenterGlobalY = pageRect.top + initialY + initialHeight / 2;
@@ -110,6 +105,7 @@ export default function Page({
             const angleStart = Math.atan2(startY - itemCenterGlobalY, startX - itemCenterGlobalX);
             const angleCurrent = Math.atan2(e.clientY - itemCenterGlobalY, e.clientX - itemCenterGlobalX);
             newRotation = initialRotation + (angleCurrent - angleStart) * (180 / Math.PI);
+            updateItemSizeRotation(page.id, itemId, newWidth, newHeight, newRotation, newX, newY);
         } else {
             if (type.includes('r')) newWidth = Math.max(MIN_SIZE, initialWidth + deltaX);
             if (type.includes('b')) newHeight = Math.max(MIN_SIZE, initialHeight + deltaY);
@@ -121,9 +117,24 @@ export default function Page({
                 const proposedHeight = initialHeight - deltaY;
                 if (proposedHeight >= MIN_SIZE) { newHeight = proposedHeight; newY = initialY + deltaY; }
             }
+            
+            updateItemSizeRotation(page.id, itemId, newWidth, newHeight, newRotation, newX, newY);
+
+            if (initialImgW !== undefined) {
+                const scaleX = newWidth / initialWidth;
+                const scaleY = newHeight / initialHeight;
+                const newImgW = initialImgW * scaleX;
+                const newImgH = initialImgH * scaleY;
+                const newImgX = initialImgX * scaleX;
+                const newImgY = initialImgY * scaleY;
+
+                updateItemField(page.id, itemId, 'imgW', newImgW);
+                updateItemField(page.id, itemId, 'imgH', newImgH);
+                updateItemField(page.id, itemId, 'imgX', newImgX);
+                updateItemField(page.id, itemId, 'imgY', newImgY);
+            }
         }
-        updateItemSizeRotation(page.id, itemId, newWidth, newHeight, newRotation, newX, newY);
-    }, [activeControl, page.id, updateItemSizeRotation]); 
+    }, [activeControl, page.id, updateItemSizeRotation, updateItemField]); 
 
     React.useEffect(() => {
         if (activeControl) {
@@ -140,8 +151,8 @@ export default function Page({
         <div 
             ref={constraintsRef} 
             className={`page ${isLeft ? "left-page" : ""} ${isRight ? "right-page" : ""} 
-                       ${isTurning === "forward" ? "turning-forward" : ""} 
-                       ${isTurning === "backward" ? "turning-backward" : ""}`}
+                        ${isTurning === "forward" ? "turning-forward" : ""} 
+                        ${isTurning === "backward" ? "turning-backward" : ""}`}
             onClick={handlePageClick}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
@@ -162,32 +173,15 @@ export default function Page({
                     onTap={(e) => { e.stopPropagation(); setSelectedItemId(item.id); }} 
                     handleResizeRotateStart={handleResizeRotateStart}
                     activeControl={activeControl}
-                    
-                    // Feature 2: Pass down field updater for cropping
                     updateItemField={updateItemField}
                 />
             ))}
-
-            {/* Feature 4: Corners */}
-            {/* Left Page corners: TL and BL */}
+            
             {isLeft && ["tl", "bl"].map((corner) => (
-                <div
-                    key={corner}
-                    className={`corner ${corner} ${hoverCorner === corner ? "folded" : ""}`}
-                    onMouseEnter={() => setHoverCorner(corner)}
-                    onMouseLeave={() => setHoverCorner(null)}
-                    onClick={() => handleCornerClick(corner)}
-                />
+                <div key={corner} className={`corner ${corner} ${hoverCorner === corner ? "folded" : ""}`} onMouseEnter={() => setHoverCorner(corner)} onMouseLeave={() => setHoverCorner(null)} onClick={() => handleCornerClick(corner)} />
             ))}
-            {/* Right Page corners: TR and BR */}
             {isRight && ["tr", "br"].map((corner) => (
-                <div
-                    key={corner}
-                    className={`corner ${corner} ${hoverCorner === corner ? "folded" : ""}`}
-                    onMouseEnter={() => setHoverCorner(corner)}
-                    onMouseLeave={() => setHoverCorner(null)}
-                    onClick={() => handleCornerClick(corner)}
-                />
+                <div key={corner} className={`corner ${corner} ${hoverCorner === corner ? "folded" : ""}`} onMouseEnter={() => setHoverCorner(corner)} onMouseLeave={() => setHoverCorner(null)} onClick={() => handleCornerClick(corner)} />
             ))}
         </div>
     );

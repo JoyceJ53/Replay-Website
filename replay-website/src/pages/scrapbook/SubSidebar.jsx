@@ -10,27 +10,23 @@ export default function SubSidebar({
     mediaFiles,
     scrapbookId,
     setMediaFiles,
-    // Feature 1 Props
     selectedItemData,
     updateItemField
 }) {
     const [showUploadModal, setShowUploadModal] = useState(false);
 
     const handleDragStart = (e, mediaItem) => {
-        // ... (Existing logic same as before)
         const itemType = mediaItem.type || (selectedTab === "music" ? "audio" : "image");
         const newItem = {
             ...mediaItem,
             type: itemType, 
             width: 150, height: 150, x: 0, y: 0, 
             id: Date.now() + Math.random(),
-            // Defaults for Text
             fontSize: 24, fontFamily: "Arial", content: "New Text"
         };
         e.dataTransfer.setData("application/json", JSON.stringify(newItem));
     };
 
-    // Helper for Text Editing
     const renderTextEditor = () => {
         if (!selectedItemData || selectedItemData.item.type !== 'text') {
             return (

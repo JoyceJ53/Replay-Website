@@ -34,7 +34,7 @@
 .scrapbook-pages {
   display: flex;
   gap: 0; /* No gap for book spine effect */
-  perspective: 2000px; /* Enhanced 3D depth */
+  perspective: 2000px; 
   align-items: center;
   justify-content: center;
   position: relative;
@@ -48,7 +48,7 @@
   box-shadow: 0 3px 15px rgba(0,0,0,0.1);
   overflow: hidden; 
   transform-style: preserve-3d;
-  transform-origin: center left; /* Default origin */
+  transform-origin: center left; 
   transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
   z-index: 1;
 }
@@ -149,89 +149,131 @@
   z-index: 50;
   /* Ensure border encompasses handles */
   box-sizing: border-box; 
+  /* Added to allow handles to position absolutely relative to the container */
+  /* Remove inherited outline offset */
+  outline-offset: 0; 
+  /* Prevent the content (like image) from getting mouse events */
+  pointer-events: auto;
 }
 
 .scrapbook-item-container.selected {
-  outline: 2px dashed #007bff;
-  outline-offset: 2px;
+  /* Use border instead of outline for better control over handle placement */
+  border: 1px dashed #007bff;
 }
 
 .scrapbook-item-container.cropping {
-  outline: 2px solid #ff9800; /* Orange for crop mode */
+  /* Override border for crop mode */
+  border: 1px dashed #ff9800;
+  outline: none; /* Clear previous outline */
   cursor: move; /* Move icon for panning image */
 }
 
 .scrapbook-item-container img {
   display: block;
-  /* Feature 2: These allow the crop/pan effect */
   width: 100%;
   height: 100%;
   object-fit: cover; 
   pointer-events: none; /* Let clicks pass to container */
 }
 
-/* --- CONTROLS --- */
+/* --- CONTROL BUTTONS (Delete and Crop Toggle) --- */
 
-/* Feature 3: Delete Button Moved */
-.delete-item-btn {
+.delete-item-btn,
+.crop-item-btn {
   position: absolute;
-  top: -25px; /* Moved further up */
-  right: -25px; /* Moved further right */
   width: 24px;
   height: 24px;
-  background: #ff4d4d;
-  color: white;
-  border: 2px solid white;
+  background: white; 
   border-radius: 50%;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   z-index: 100;
+  font-size: 14px;
+  line-height: 1;
 }
 
-.crop-item-btn {
-  position: absolute;
-  top: -25px;
-  right: 5px; /* Sit next to delete button */
-  width: 24px;
-  height: 24px;
-  background: #ff9800;
-  color: white;
-  border: 2px solid white;
-  border-radius: 50%;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  z-index: 100;
+/* Delete Button (Top Right corner - Outside the box) */
+.delete-item-btn {
+  top: -12px;
+  right: -12px;
+  border: 2px solid #ff4d4d;
+  color: #ff4d4d;
 }
+
+/* Crop Button (Top Left corner - Outside the box) */
+.crop-item-btn {
+  top: -12px;
+  left: -12px;
+  border: 2px solid #ff9800;
+  color: #ff9800;
+}
+
+/* --- RESIZE & ROTATE HANDLES --- */
 
 .control-handle {
   position: absolute;
   width: 10px;
   height: 10px;
-  background: white;
-  border: 1px solid #007bff;
-  z-index: 60;
+  background: #007bff;
+  border: 1px solid white;
+  border-radius: 50%;
+  z-index: 101;
 }
 
-.rotate-handle {
-  top: -20px;
+/* Rotate Handle (Bottom Center - Moved from Top) */
+.control-handle.rotate-handle {
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  border-radius: 50%;
-  cursor: pointer;
+  cursor: grab;
 }
 
+/* Resize Handles (Corners - Pushed outside the border) */
 .resize-handle.tl { top: -5px; left: -5px; cursor: nwse-resize; }
 .resize-handle.tr { top: -5px; right: -5px; cursor: nesw-resize; }
 .resize-handle.bl { bottom: -5px; left: -5px; cursor: swne-resize; }
 .resize-handle.br { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
+
+/* --- CROP HANDLES (The bars on the side) --- */
+.crop-handle {
+    position: absolute;
+    background-color: #ff9800; 
+    z-index: 60;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    border: 1px solid #fff;
+    opacity: 1; /* Ensure full visibility */
+}
+
+/* Horizontal Crop Handles (Top/Bottom) - Snug against the border */
+.crop-handle.n, 
+.crop-handle.s {
+    height: 6px;
+    width: 40px; 
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: ns-resize;
+    border-radius: 4px;
+}
+.crop-handle.n { top: -4px; }
+.crop-handle.s { bottom: -4px; }
+
+/* Vertical Crop Handles (Left/Right) - Snug against the border */
+.crop-handle.e, 
+.crop-handle.w {
+    width: 6px;
+    height: 40px; 
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    border-radius: 4px;
+}
+.crop-handle.w { left: -4px; }
+.crop-handle.e { right: -4px; }
 
 .add-page-button {
   width: 50px;

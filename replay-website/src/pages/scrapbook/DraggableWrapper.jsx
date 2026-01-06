@@ -1,5 +1,5 @@
 // src/pages/scrapbook/DraggableWrapper.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, useMotionValue } from 'framer-motion'; 
 import AudioPlayer from "./AudioPlayer"; 
 
@@ -17,46 +17,142 @@ const DraggableWrapper = ({
     handleResizeRotateStart, 
     activeControl, 
     x, y,
-    updateItemField // Feature 2: Needed to save crop position
+    updateItemField 
 }) => {
     const isSelected = selectedItemId === item.id;
     const isControlActive = !!activeControl; 
 
-    // Feature 2: Crop Mode State
     const [isCropping, setIsCropping] = useState(false);
-
     const xMv = useMotionValue(x || 0);
     const yMv = useMotionValue(y || 0);
 
+    // --- SYNC MOTION VALUES ---
     useEffect(() => {
         xMv.set(x || 0);
         yMv.set(y || 0);
     }, [x, y, xMv, yMv]);
 
     useEffect(() => {
-        // Turn off crop if deselected
+        // Ensure crop mode is disabled when the item is deselected
         if (!isSelected) setIsCropping(false);
     }, [isSelected]);
 
-    // If cropping, disable main drag. If resizing, disable main drag.
-    const isDraggable = drag && !isControlActive && !isCropping;
+    // --- CROP INITIALIZATION & STATE ---
+    const imgW = item.imgW !== undefined ? item.imgW : "100%";
+    const imgH = item.imgH !== undefined ? item.imgH : "100%";
+    const imgX = item.imgX || 0;
+    const imgY = item.imgY || 0;
 
-    // Feature 2: Handle Panning the Image inside the box
-    const handleCropPan = (e) => {
-        if(!isCropping) return;
+    const toggleCrop = (e) => {
         e.stopPropagation();
-        // Calculate simpler pan logic based on movement
-        const sensitivity = 0.5; // slow down the pan
-        const newX = (item.objectPositionX || 50) - (e.movementX * sensitivity);
-        const newY = (item.objectPositionY || 50) - (e.movementY * sensitivity);
-        
-        // Clamp between 0 and 100%
-        const clampedX = Math.max(0, Math.min(100, newX));
-        const clampedY = Math.max(0, Math.min(100, newY));
-
-        updateItemField(pageId, item.id, 'objectPositionX', clampedX);
-        updateItemField(pageId, item.id, 'objectPositionY', clampedY);
+        if (!isCropping) {
+            // ENTERING CROP MODE
+            if (item.imgW === undefined) {
+                // Initialize internal image size to match container size
+                updateItemField(pageId, item.id, 'imgW', item.width || 100);
+                updateItemField(pageId, item.id, 'imgH', item.height || 100);
+                updateItemField(pageId, item.id, 'imgX', 0);
+                updateItemField(pageId, item.id, 'imgY', 0);
+            }
+        }
+        setIsCropping(!isCropping);
     };
+
+    // --- CROP HANDLER (The "Cutting" Logic) ---
+    const handleCropStart = (e, direction) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        
+        // Snapshot current state
+        const startW = item.width || 100;
+        const startH = item.height || 100;
+        const startXPos = item.x || 0;
+        const startYPos = item.y || 0;
+        
+        const startImgX = item.imgX || 0;
+        const startImgY = item.imgY || 0;
+
+        const onPointerMove = (ev) => {
+            const deltaX = ev.clientX - startX;
+            const deltaY = ev.clientY - startY;
+            const MIN_SIZE = 20;
+
+            let newW = startW, newH = startH, newX = startXPos, newY = startYPos;
+            let newImgX = startImgX, newImgY = startImgY;
+
+            if (direction === 'e') { 
+                newW = Math.max(MIN_SIZE, startW + deltaX);
+            }
+            else if (direction === 'w') { 
+                const proposedW = startW - deltaX;
+                if (proposedW >= MIN_SIZE) {
+                    newW = proposedW;
+                    newX = startXPos + deltaX;
+                    newImgX = startImgX - deltaX;
+                }
+            }
+            else if (direction === 's') { 
+                newH = Math.max(MIN_SIZE, startH + deltaY);
+            }
+            else if (direction === 'n') { 
+                const proposedH = startH - deltaY;
+                if (proposedH >= MIN_SIZE) {
+                    newH = proposedH;
+                    newY = startYPos + deltaY;
+                    newImgY = startImgY - deltaY;
+                }
+            }
+
+            // Direct update for performance
+            updateItemField(pageId, item.id, 'width', newW);
+            updateItemField(pageId, item.id, 'height', newH);
+            updateItemField(pageId, item.id, 'x', newX);
+            updateItemField(pageId, item.id, 'y', newY);
+            updateItemField(pageId, item.id, 'imgX', newImgX);
+            updateItemField(pageId, item.id, 'imgY', newImgY);
+        };
+
+        const onPointerUp = () => {
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+        };
+
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+    };
+
+    // --- PAN HANDLER (Moving the image inside the frame) ---
+    const handlePanStart = (e) => {
+        if (!isCropping) return;
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startImgX = item.imgX || 0;
+        const startImgY = item.imgY || 0;
+
+        const onPointerMove = (ev) => {
+            const deltaX = ev.clientX - startX;
+            const deltaY = ev.clientY - startY;
+            updateItemField(pageId, item.id, 'imgX', startImgX + deltaX);
+            updateItemField(pageId, item.id, 'imgY', startImgY + deltaY);
+        };
+
+        const onPointerUp = () => {
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+        };
+
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+    };
+
+    // Item container is draggable only when not resizing/rotating or cropping
+    const isDraggable = drag && !isControlActive && !isCropping;
 
     return (
         <motion.div
@@ -68,8 +164,10 @@ const DraggableWrapper = ({
                 height: item.height || 100,
                 rotate: item.rotation || 0,
                 position: 'absolute', 
-                cursor: isDraggable ? 'grab' : (isCropping ? 'move' : 'default'),
-                zIndex: isSelected ? 100 : 50
+                cursor: isDraggable ? 'grab' : (isCropping ? 'move' : 'default'), // Use 'move' cursor when panning image
+                zIndex: isSelected ? 100 : 50,
+                overflow: 'hidden', 
+                touchAction: 'none'
             }}
             drag={isDraggable} 
             dragConstraints={dragConstraints}
@@ -81,10 +179,10 @@ const DraggableWrapper = ({
             }}
             onTap={onTap}
             onDragStart={onDragStart}
-            // Feature 2: Capture mouse move for cropping
-            onMouseMove={(e) => { if(isCropping && e.buttons === 1) handleCropPan(e.nativeEvent); }}
+            // If cropping, clicking the image pans it instead of dragging the container
+            onPointerDown={isCropping ? handlePanStart : undefined}
         >
-            {/* --- CONTENT --- */}
+            {/* --- ITEM CONTENT --- */}
             {item.type === "text" ? (
                 <div 
                     style={{ 
@@ -108,10 +206,14 @@ const DraggableWrapper = ({
                     alt={item.name} 
                     draggable="false"
                     style={{ 
-                        // Feature 2: CSS Logic for Crop/Pan
-                        objectPosition: `${item.objectPositionX || 50}% ${item.objectPositionY || 50}%`,
-                        transform: isCropping ? 'scale(1.2)' : 'scale(1)', // Slight zoom to indicate editable area
-                        transition: 'transform 0.2s'
+                        position: item.imgW ? 'absolute' : 'static', // Switch to absolute pos for cropping
+                        width: imgW,
+                        height: imgH,
+                        left: imgX,
+                        top: imgY,
+                        objectFit: item.imgW ? 'fill' : 'cover',
+                        pointerEvents: 'none', 
+                        userSelect: 'none'
                     }}
                 />
             )}
@@ -119,9 +221,10 @@ const DraggableWrapper = ({
             {/* --- CONTROLS --- */}
             {isSelected && (
                 <>
-                    {/* Feature 3: Delete Button (Class moved in CSS) */}
+                     {/* DELETE BUTTON (Top Right) */}
                     <button
                         className="delete-item-btn"
+                        onPointerDown={(e) => e.stopPropagation()} 
                         onClick={(e) => {
                             e.stopPropagation(); 
                             if (window.confirm("Delete this item?")) {
@@ -133,34 +236,46 @@ const DraggableWrapper = ({
                         &times;
                     </button>
 
-                    {/* Feature 2: Crop Button (Only for images) */}
+                    {/* CROP BUTTON (Top Left, typically) */}
                     {item.type !== 'text' && item.type !== 'audio' && (
                         <button
                             className="crop-item-btn"
                             title={isCropping ? "Done Cropping" : "Crop Image"}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsCropping(!isCropping);
-                            }}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={toggleCrop}
                         >
                             {isCropping ? "✓" : "✂"}
                         </button>
                     )}
                     
-                    {/* Hide rotate/resize handles while cropping to reduce clutter */}
+                    {/* --- STANDARD CONTROLS (Hidden when cropping) --- */}
                     {!isCropping && (
                         <>
+                            {/* ROTATE HANDLE */}
                             <div 
                                 className="control-handle rotate-handle" 
-                                onMouseDown={(e) => handleResizeRotateStart(e, item.id, 'rotate')}
+                                onMouseDown={(e) => { e.stopPropagation(); handleResizeRotateStart(e, item.id, 'rotate'); }}
                             />
+                            {/* RESIZE HANDLES (Corners) */}
                             {['tl', 'tr', 'bl', 'br'].map((dir) => (
                                 <div 
                                     key={dir}
                                     className={`control-handle resize-handle ${dir}`}
-                                    onMouseDown={(e) => handleResizeRotateStart(e, item.id, dir)}
+                                    onMouseDown={(e) => { e.stopPropagation(); handleResizeRotateStart(e, item.id, dir); }}
                                 />
                             ))}
+                        </>
+                    )}
+
+                    {/* --- CROP SIDE HANDLES (Visible only when cropping) --- */}
+                    {isCropping && item.type !== 'text' && item.type !== 'audio' && (
+                        <>
+                            <div className="crop-handle n" onPointerDown={(e) => handleCropStart(e, 'n')} />
+                            <div className="crop-handle s" onPointerDown={(e) => handleCropStart(e, 's')} />
+                            <div className="crop-handle w" onPointerDown={(e) => handleCropStart(e, 'w')} />
+                            <div className="crop-handle e" onPointerDown={(e) => handleCropStart(e, 'e')} />
+                            {/* Visual guide */}
+                            <div style={{position:'absolute', inset:0, border:'1px dashed #ff9800', pointerEvents:'none'}}/>
                         </>
                     )}
                 </>

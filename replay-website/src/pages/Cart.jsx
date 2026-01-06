@@ -7,10 +7,6 @@ export default function PurchasePage() {
 
   return (
     <div className="cart-hero">
-      {/* There is a first part to the purchasing process on the figma design, I don't know what goes here */}
-
-
-
       {/* Billing & Payment Information */}
       <div className="left-container">
         <div className="billing-info-container">
@@ -68,6 +64,6 @@ export default function PurchasePage() {
       </div>
     </div>
     
-    // Add "thanks for your purchase" (third part) here
+    // Add "thanks for your purchase" here
   );
 }
